@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -479,12 +478,10 @@
      * DANH SÁCH 30 TRUYỆN
      * ============================================================
      *
-     * Các file MP3 phải nằm trong thư mục:
-     *
-     * mp3/
+     * Các file MP3 nằm CÙNG CẤP với index.html (thư mục gốc).
      *
      * Ví dụ:
-     * mp3/1. Sự tích chú Cuội cung trăng.mp3
+     * 1. Sự tích chú Cuội cung trăng.mp3
      *
      */
 
@@ -750,6 +747,9 @@
          * - khoảng trắng
          * - dấu phẩy
          * - dấu gạch ngang
+         *
+         * File mp3 nằm CÙNG CẤP với index.html (thư mục gốc),
+         * nên KHÔNG thêm tiền tố thư mục con vào đây.
          */
 
         player.src = encodeURIComponent(song.file);
@@ -1104,4 +1104,3 @@
 
 </body>
 </html>
-```
