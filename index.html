@@ -1,0 +1,1107 @@
+```html
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#111827">
+
+    <title>Kho Truyện Cổ Tích</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top, #374151 0%, #111827 45%, #030712 100%);
+            color: #fff;
+        }
+
+        .container {
+            width: min(1000px, 94%);
+            margin: 0 auto;
+            padding: 35px 0 50px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        header h1 {
+            margin: 0 0 8px;
+            font-size: clamp(28px, 5vw, 44px);
+        }
+
+        header p {
+            margin: 0;
+            color: #9ca3af;
+        }
+
+        /* PLAYER */
+
+        .player {
+            background: rgba(17, 24, 39, .92);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 24px;
+            padding: 28px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.4);
+            margin-bottom: 25px;
+        }
+
+        .now-playing {
+            text-align: center;
+            margin-bottom: 22px;
+        }
+
+        .cover {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            box-shadow: 0 10px 35px rgba(99,102,241,.35);
+        }
+
+        .cover.playing {
+            animation: rotate 5s linear infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        #songTitle {
+            font-size: 21px;
+            font-weight: bold;
+            line-height: 1.4;
+        }
+
+        #songNumber {
+            margin-top: 5px;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        /* PROGRESS */
+
+        .progress-area {
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 7px;
+            appearance: none;
+            cursor: pointer;
+            border-radius: 10px;
+            background: #374151;
+        }
+
+        .progress-bar::-webkit-slider-thumb {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #818cf8;
+            cursor: pointer;
+        }
+
+        .progress-bar::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border: 0;
+            border-radius: 50%;
+            background: #818cf8;
+            cursor: pointer;
+        }
+
+        .time {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 7px;
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+        /* CONTROLS */
+
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            margin: 22px 0;
+        }
+
+        .control-btn {
+            width: 46px;
+            height: 46px;
+            border: 0;
+            border-radius: 50%;
+            cursor: pointer;
+            color: white;
+            background: #374151;
+            font-size: 19px;
+            transition: .2s;
+        }
+
+        .control-btn:hover {
+            transform: scale(1.08);
+            background: #4b5563;
+        }
+
+        .play-btn {
+            width: 64px;
+            height: 64px;
+            font-size: 27px;
+            background: #6366f1;
+        }
+
+        .play-btn:hover {
+            background: #818cf8;
+        }
+
+        .active {
+            background: #6366f1 !important;
+        }
+
+        /* VOLUME */
+
+        .volume-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #d1d5db;
+        }
+
+        .volume {
+            width: 130px;
+            accent-color: #818cf8;
+        }
+
+        /* SEARCH */
+
+        .library {
+            background: rgba(17, 24, 39, .92);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.25);
+        }
+
+        .library-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 18px;
+        }
+
+        .library h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .search {
+            width: 100%;
+            padding: 13px 16px;
+            border: 1px solid #374151;
+            border-radius: 12px;
+            outline: none;
+            background: #1f2937;
+            color: white;
+            font-size: 15px;
+            margin-bottom: 15px;
+        }
+
+        .search:focus {
+            border-color: #6366f1;
+        }
+
+        /* SONG LIST */
+
+        #songList {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        #songList::-webkit-scrollbar {
+            width: 7px;
+        }
+
+        #songList::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 10px;
+        }
+
+        .song {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 13px 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: .2s;
+            margin-bottom: 4px;
+        }
+
+        .song:hover {
+            background: #1f2937;
+        }
+
+        .song.active-song {
+            background: rgba(99,102,241,.18);
+            color: #a5b4fc;
+        }
+
+        .song-number {
+            width: 28px;
+            color: #6b7280;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .song.active-song .song-number {
+            color: #818cf8;
+        }
+
+        .song-name {
+            flex: 1;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        .music-icon {
+            color: #6366f1;
+            font-size: 16px;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 30px;
+            color: #9ca3af;
+        }
+
+        footer {
+            text-align: center;
+            color: #6b7280;
+            font-size: 13px;
+            margin-top: 25px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 92%;
+                padding-top: 25px;
+            }
+
+            .player,
+            .library {
+                padding: 20px;
+                border-radius: 18px;
+            }
+
+            .controls {
+                gap: 12px;
+            }
+
+            .control-btn {
+                width: 42px;
+                height: 42px;
+            }
+
+            .play-btn {
+                width: 58px;
+                height: 58px;
+            }
+
+            .library-header {
+                display: block;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>📚 Kho Truyện Cổ Tích</h1>
+        <p>Thư viện truyện audio dành cho bé</p>
+    </header>
+
+    <!-- PLAYER -->
+    <section class="player">
+
+        <div class="now-playing">
+
+            <div class="cover" id="cover">
+                🎧
+            </div>
+
+            <div id="songTitle">
+                Chưa chọn truyện
+            </div>
+
+            <div id="songNumber">
+                Hãy chọn một truyện bên dưới
+            </div>
+
+        </div>
+
+        <audio id="audioPlayer" preload="metadata"></audio>
+
+        <div class="progress-area">
+
+            <input
+                type="range"
+                id="progress"
+                class="progress-bar"
+                min="0"
+                max="100"
+                value="0"
+            >
+
+            <div class="time">
+                <span id="currentTime">0:00</span>
+                <span id="duration">0:00</span>
+            </div>
+
+        </div>
+
+        <div class="controls">
+
+            <button
+                class="control-btn"
+                id="shuffleBtn"
+                title="Phát ngẫu nhiên"
+                onclick="toggleShuffle()">
+                🔀
+            </button>
+
+            <button
+                class="control-btn"
+                title="Bài trước"
+                onclick="previousSong()">
+                ⏮
+            </button>
+
+            <button
+                class="control-btn play-btn"
+                id="playBtn"
+                title="Phát / Tạm dừng"
+                onclick="togglePlay()">
+                ▶
+            </button>
+
+            <button
+                class="control-btn"
+                title="Bài tiếp theo"
+                onclick="nextSong()">
+                ⏭
+            </button>
+
+            <button
+                class="control-btn"
+                id="repeatBtn"
+                title="Lặp lại"
+                onclick="toggleRepeat()">
+                🔁
+            </button>
+
+        </div>
+
+        <div class="volume-area">
+            🔊
+            <input
+                type="range"
+                id="volume"
+                class="volume"
+                min="0"
+                max="1"
+                step="0.01"
+                value="1"
+            >
+        </div>
+
+    </section>
+
+
+    <!-- LIBRARY -->
+    <section class="library">
+
+        <div class="library-header">
+            <h2>🎵 Danh sách truyện</h2>
+        </div>
+
+        <input
+            type="search"
+            id="search"
+            class="search"
+            placeholder="🔎 Tìm tên truyện..."
+        >
+
+        <ul id="songList"></ul>
+
+    </section>
+
+    <footer>
+        Trình phát truyện audio • GitHub Pages
+    </footer>
+
+</div>
+
+
+<script>
+
+    /*
+     * ============================================================
+     * DANH SÁCH 30 TRUYỆN
+     * ============================================================
+     *
+     * Các file MP3 phải nằm trong thư mục:
+     *
+     * mp3/
+     *
+     * Ví dụ:
+     * mp3/1. Sự tích chú Cuội cung trăng.mp3
+     *
+     */
+
+    const songs = [
+
+        {
+            title: "Sự tích chú Cuội cung trăng",
+            file: "1. Sự tích chú Cuội cung trăng.mp3"
+        },
+
+        {
+            title: "Sự tích dưa hấu",
+            file: "2. Sự tích dưa hấu.mp3"
+        },
+
+        {
+            title: "Sự tích bánh chưng, bánh giầy",
+            file: "3. Sự tích bánh chưng, bánh giầy.mp3"
+        },
+
+        {
+            title: "Cây tre trăm đốt",
+            file: "4. Cây tre trăm đốt.mp3"
+        },
+
+        {
+            title: "Câu chuyện bó đũa",
+            file: "5. Câu chuyện bó đũa.mp3"
+        },
+
+        {
+            title: "Cây khế",
+            file: "6. Cây khế.mp3"
+        },
+
+        {
+            title: "Cậu bé Tích Chu",
+            file: "7. Cậu bé Tích Chu.mp3"
+        },
+
+        {
+            title: "Thỏ, hổ và gà",
+            file: "8. Thỏ, hổ và gà.mp3"
+        },
+
+        {
+            title: "Sự tích Hồ Gươm",
+            file: "9. Sự tích Hồ Gươm.mp3"
+        },
+
+        {
+            title: "Sự tích cây vú sữa",
+            file: "10. Sự tích cây vú sữa.mp3"
+        },
+
+        {
+            title: "Thánh Gióng",
+            file: "11. Thánh Gióng.mp3"
+        },
+
+        {
+            title: "Sự tích cây chổi",
+            file: "12. Sự tích cây chổi.mp3"
+        },
+
+        {
+            title: "Sơn Tinh - Thuỷ Tinh",
+            file: "13. Sơn Tinh - Thuỷ Tinh.mp3"
+        },
+
+        {
+            title: "Sự tích quả bầu tiên",
+            file: "14. Sự tích quả bầu tiên.mp3"
+        },
+
+        {
+            title: "Sự tích mèo và chuột",
+            file: "15. Sự tích mèo và chuột.mp3"
+        },
+
+        {
+            title: "Cóc kiện trời",
+            file: "16. Cóc kiện trời.mp3"
+        },
+
+        {
+            title: "Sự tích rét nàng Bân",
+            file: "17. Sự tích rét nàng Bân.mp3"
+        },
+
+        {
+            title: "Sọ Dừa",
+            file: "18. Sọ Dừa.mp3"
+        },
+
+        {
+            title: "Sự tích cây gạo",
+            file: "19. Sự tích cây gạo.mp3"
+        },
+
+        {
+            title: "Sự tích con dã tràng",
+            file: "20. Sự tích con dã tràng.mp3"
+        },
+
+        {
+            title: "Sự tích củ khoai lang",
+            file: "21. Sự tích củ khoai lang.mp3"
+        },
+
+        {
+            title: "Sự tích hoa mào gà",
+            file: "22. Sự tích hoa mào gà.mp3"
+        },
+
+        {
+            title: "Sự tích con ong",
+            file: "23. Sự tích con ong.mp3"
+        },
+
+        {
+            title: "Sự tích con khỉ",
+            file: "24. Sự tích con khỉ.mp3"
+        },
+
+        {
+            title: "Mưu con thỏ",
+            file: "25. Mưu con thỏ.mp3"
+        },
+
+        {
+            title: "Sự tích con trâu",
+            file: "26. Sự tích con trâu.mp3"
+        },
+
+        {
+            title: "Sự tích bộ lông quạ và bộ lông công",
+            file: "27. Sự tích bộ lông quạ và bộ lông công.mp3"
+        },
+
+        {
+            title: "Trí khôn của ta đây",
+            file: "28. Trí khôn của ta đây.mp3"
+        },
+
+        {
+            title: "Thạch Sanh",
+            file: "29. Thạch Sanh.mp3"
+        },
+
+        {
+            title: "Tấm Cám",
+            file: "30. Tấm Cám.mp3"
+        }
+
+    ];
+
+
+    /* ============================================================
+       BIẾN
+       ============================================================ */
+
+    const player = document.getElementById("audioPlayer");
+    const playBtn = document.getElementById("playBtn");
+    const progress = document.getElementById("progress");
+    const volume = document.getElementById("volume");
+    const songList = document.getElementById("songList");
+    const search = document.getElementById("search");
+
+    const songTitle = document.getElementById("songTitle");
+    const songNumber = document.getElementById("songNumber");
+    const currentTime = document.getElementById("currentTime");
+    const duration = document.getElementById("duration");
+    const cover = document.getElementById("cover");
+
+    let currentIndex = 0;
+    let isShuffle = false;
+    let isRepeat = false;
+
+
+    /* ============================================================
+       HIỂN THỊ DANH SÁCH
+       ============================================================ */
+
+    function renderSongs(filter = "") {
+
+        songList.innerHTML = "";
+
+        const keyword = filter.toLowerCase().trim();
+
+        const filteredSongs = songs
+            .map((song, index) => ({
+                ...song,
+                index
+            }))
+            .filter(song =>
+                song.title.toLowerCase().includes(keyword)
+            );
+
+        if (filteredSongs.length === 0) {
+
+            songList.innerHTML = `
+                <li class="empty">
+                    Không tìm thấy truyện nào.
+                </li>
+            `;
+
+            return;
+        }
+
+        filteredSongs.forEach(song => {
+
+            const li = document.createElement("li");
+
+            li.className =
+                "song " +
+                (song.index === currentIndex
+                    ? "active-song"
+                    : "");
+
+            li.innerHTML = `
+                <span class="song-number">
+                    ${String(song.index + 1).padStart(2, "0")}
+                </span>
+
+                <span class="song-name">
+                    ${escapeHtml(song.title)}
+                </span>
+
+                ${
+                    song.index === currentIndex
+                    ? '<span class="music-icon">♪</span>'
+                    : ''
+                }
+            `;
+
+            li.onclick = () => playSong(song.index);
+
+            songList.appendChild(li);
+
+        });
+
+    }
+
+
+    /* ============================================================
+       PHÁT BÀI
+       ============================================================ */
+
+    function playSong(index) {
+
+        if (index < 0 || index >= songs.length) {
+            return;
+        }
+
+        currentIndex = index;
+
+        const song = songs[currentIndex];
+
+        /*
+         * encodeURIComponent giúp xử lý:
+         * - tiếng Việt
+         * - khoảng trắng
+         * - dấu phẩy
+         * - dấu gạch ngang
+         */
+
+        player.src = "mp3/" + encodeURIComponent(song.file);
+
+        songTitle.textContent = song.title;
+
+        songNumber.textContent =
+            `Truyện ${currentIndex + 1} / ${songs.length}`;
+
+        renderSongs(search.value);
+
+        player.play()
+            .then(() => {
+
+                playBtn.textContent = "⏸";
+                cover.classList.add("playing");
+
+            })
+            .catch(error => {
+
+                console.log("Không thể tự động phát:", error);
+
+                playBtn.textContent = "▶";
+
+            });
+
+    }
+
+
+    /* ============================================================
+       PLAY / PAUSE
+       ============================================================ */
+
+    function togglePlay() {
+
+        if (!player.src) {
+
+            playSong(0);
+
+            return;
+        }
+
+        if (player.paused) {
+
+            player.play();
+
+        } else {
+
+            player.pause();
+
+        }
+
+    }
+
+
+    /* ============================================================
+       BÀI TIẾP THEO
+       ============================================================ */
+
+    function nextSong() {
+
+        let nextIndex;
+
+        if (isShuffle) {
+
+            if (songs.length <= 1) {
+                nextIndex = currentIndex;
+            } else {
+
+                do {
+                    nextIndex =
+                        Math.floor(Math.random() * songs.length);
+                }
+                while (nextIndex === currentIndex);
+
+            }
+
+        } else {
+
+            nextIndex = currentIndex + 1;
+
+            if (nextIndex >= songs.length) {
+                nextIndex = 0;
+            }
+
+        }
+
+        playSong(nextIndex);
+
+    }
+
+
+    /* ============================================================
+       BÀI TRƯỚC
+       ============================================================ */
+
+    function previousSong() {
+
+        /*
+         * Nếu bài đang phát quá 3 giây,
+         * bấm Previous sẽ quay lại đầu bài.
+         */
+
+        if (player.currentTime > 3) {
+
+            player.currentTime = 0;
+
+            return;
+        }
+
+        let previousIndex = currentIndex - 1;
+
+        if (previousIndex < 0) {
+            previousIndex = songs.length - 1;
+        }
+
+        playSong(previousIndex);
+
+    }
+
+
+    /* ============================================================
+       SHUFFLE
+       ============================================================ */
+
+    function toggleShuffle() {
+
+        isShuffle = !isShuffle;
+
+        document
+            .getElementById("shuffleBtn")
+            .classList.toggle("active", isShuffle);
+
+    }
+
+
+    /* ============================================================
+       REPEAT
+       ============================================================ */
+
+    function toggleRepeat() {
+
+        isRepeat = !isRepeat;
+
+        document
+            .getElementById("repeatBtn")
+            .classList.toggle("active", isRepeat);
+
+    }
+
+
+    /* ============================================================
+       AUDIO EVENTS
+       ============================================================ */
+
+    player.addEventListener("play", () => {
+
+        playBtn.textContent = "⏸";
+
+        cover.classList.add("playing");
+
+    });
+
+
+    player.addEventListener("pause", () => {
+
+        playBtn.textContent = "▶";
+
+        cover.classList.remove("playing");
+
+    });
+
+
+    player.addEventListener("loadedmetadata", () => {
+
+        duration.textContent =
+            formatTime(player.duration);
+
+    });
+
+
+    player.addEventListener("timeupdate", () => {
+
+        if (!player.duration) {
+            return;
+        }
+
+        const percentage =
+            (player.currentTime / player.duration) * 100;
+
+        progress.value = percentage;
+
+        currentTime.textContent =
+            formatTime(player.currentTime);
+
+    });
+
+
+    /* ============================================================
+       TỰ ĐỘNG CHUYỂN BÀI
+       ============================================================ */
+
+    player.addEventListener("ended", () => {
+
+        if (isRepeat) {
+
+            player.currentTime = 0;
+
+            player.play();
+
+            return;
+        }
+
+        nextSong();
+
+    });
+
+
+    /* ============================================================
+       THANH TIẾN TRÌNH
+       ============================================================ */
+
+    progress.addEventListener("input", () => {
+
+        if (!player.duration) {
+            return;
+        }
+
+        player.currentTime =
+            (progress.value / 100) * player.duration;
+
+    });
+
+
+    /* ============================================================
+       ÂM LƯỢNG
+       ============================================================ */
+
+    volume.addEventListener("input", () => {
+
+        player.volume = volume.value;
+
+    });
+
+
+    /* ============================================================
+       TÌM KIẾM
+       ============================================================ */
+
+    search.addEventListener("input", () => {
+
+        renderSongs(search.value);
+
+    });
+
+
+    /* ============================================================
+       FORMAT THỜI GIAN
+       ============================================================ */
+
+    function formatTime(seconds) {
+
+        if (!isFinite(seconds)) {
+            return "0:00";
+        }
+
+        const minutes =
+            Math.floor(seconds / 60);
+
+        const secs =
+            Math.floor(seconds % 60);
+
+        return `${minutes}:${String(secs).padStart(2, "0")}`;
+
+    }
+
+
+    /* ============================================================
+       CHỐNG HTML TRONG TÊN FILE/TÊN TRUYỆN
+       ============================================================ */
+
+    function escapeHtml(text) {
+
+        const div =
+            document.createElement("div");
+
+        div.textContent = text;
+
+        return div.innerHTML;
+
+    }
+
+
+    /* ============================================================
+       PHÍM TẮT BÀN PHÍM
+       ============================================================ */
+
+    document.addEventListener("keydown", (event) => {
+
+        /*
+         * Không kích hoạt khi đang gõ tìm kiếm
+         */
+
+        if (document.activeElement === search) {
+            return;
+        }
+
+        switch (event.code) {
+
+            case "Space":
+
+                event.preventDefault();
+                togglePlay();
+                break;
+
+            case "ArrowRight":
+
+                if (player.duration) {
+                    player.currentTime =
+                        Math.min(
+                            player.currentTime + 10,
+                            player.duration
+                        );
+                }
+
+                break;
+
+            case "ArrowLeft":
+
+                if (player.duration) {
+                    player.currentTime =
+                        Math.max(
+                            player.currentTime - 10,
+                            0
+                        );
+                }
+
+                break;
+
+        }
+
+    });
+
+
+    /* ============================================================
+       KHỞI TẠO
+       ============================================================ */
+
+    renderSongs();
+
+</script>
+
+</body>
+</html>
+```
